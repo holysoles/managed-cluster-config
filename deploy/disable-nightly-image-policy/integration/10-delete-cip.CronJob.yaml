@@ -1,0 +1,29 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: delete-nightly-image-policy
+  namespace: openshift-disable-nightly-image-policy
+spec:
+  failedJobsHistoryLimit: 2
+  successfulJobsHistoryLimit: 2
+  concurrencyPolicy: Forbid
+  schedule: "0 */6 * * *"
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 3600
+      template:
+        spec:
+          serviceAccountName: disable-nightly-image-policy
+          restartPolicy: Never
+          containers:
+          - name: delete-cip
+            image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+            command:
+            - bash
+            - -c
+            - |
+              oc delete clusterimagepolicy openshift --ignore-not-found
+          tolerations:
+          - effect: NoSchedule
+            operator: Exists

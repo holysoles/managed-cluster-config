@@ -1,0 +1,15 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: disable-nightly-image-policy
+rules:
+- apiGroups:
+  - config.openshift.io
+  resources:
+  - clusterimagepolicies
+  resourceNames:
+  - "openshift"
+  verbs:
+  - get
+  - delete
